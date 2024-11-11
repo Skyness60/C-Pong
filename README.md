@@ -1,5 +1,8 @@
 # C - Pong
 
+![image](https://github.com/user-attachments/assets/eb8bdd84-fe2b-486f-889e-2ddb05d52c36)
+
+
 Ce projet est une réimplémentation du jeu classique Pong en utilisant la bibliothèque MiniLibX (MLX). Le but de ce projet est de reproduire le gameplay original de Pong tout en respectant les contraintes de la MLX, qui offre des fonctionnalités graphiques de base.
 Fonctionnalités
 ## Ce que fait MiniLibX
