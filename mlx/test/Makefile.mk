@@ -1,0 +1,55 @@
+# Colors for terminal output
+GREEN := \033[0;32m
+YELLOW := \033[0;33m
+NC := \033[0m  # No Color
+
+# Directories
+INC=%%%%
+INCLIB=$(INC)/../lib
+
+# Platform-specific settings
+UNAME := $(shell uname)
+ifeq ($(UNAME), Darwin)
+	# macOS
+	CC = clang
+else ifeq ($(UNAME), FreeBSD)
+	# FreeBSD
+	CC = clang
+else
+	# Linux and others
+	CC = gcc
+	LFLAGS += -lbsd
+endif
+
+# Compiler and linker flags
+CFLAGS= -I$(INC) -O3 -I.. -g
+LFLAGS = -L.. -lmlx -L$(INCLIB) -lXext -lX11 -lm
+
+# Target and sources
+NAME = mlx-test
+SRC = main.c
+OBJ = $(SRC:%.c=%.o)
+
+# Targets
+all: $(NAME)
+	@echo "${GREEN}Build successful.${NC}"
+
+$(NAME): $(OBJ)
+	@echo "${GREEN}Building $@${NC}"
+	@$(CC) -o $(NAME) $(OBJ) $(LFLAGS)
+	@echo "${GREEN} Linking complete.${NC}"
+
+show:
+	@printf "${YELLOW}UNAME     : ${NC}$(UNAME)\n"
+	@printf "${YELLOW}NAME      : ${NC}$(NAME)\n"
+	@printf "${YELLOW}CC        : ${NC}$(CC)\n"
+	@printf "${YELLOW}CFLAGS    : ${NC}$(CFLAGS)\n"
+	@printf "${YELLOW}LFLAGS    : ${NC}$(LFLAGS)\n"
+	@printf "${YELLOW}SRC       : ${NC}\n	$(SRC)\n"
+	@printf "${YELLOW}OBJ       : ${NC}\n	$(OBJ)\n"
+
+clean:
+	rm -f $(NAME) $(OBJ) *~ core *.core
+	@echo "${GREEN}Cleaned.${NC}"
+
+re: clean all

@@ -1,0 +1,97 @@
+##
+## Makefile for MiniLibX in /home/boulon/work/c/raytraceur/minilibx
+## 
+## Made by Olivier Crouzet
+## Login   <ol@epitech.net>
+## 
+## Started on  Tue Oct  5 15:56:43 2004 Olivier Crouzet
+## Last update Tue May 15 15:41:20 2007 Olivier Crouzet
+##
+
+# Include directory
+INC = include
+
+# Compiler settings
+UNAME := $(shell uname)
+CC := gcc
+ifeq ($(UNAME),FreeBSD)
+	CC := clang
+endif
+
+# Colors for output
+RED := \033[0;31m
+GREEN := \033[0;32m
+YELLOW := \033[0;33m
+BLUE := \033[0;34m
+PURPLE := \033[0;35m
+NC := \033[0m
+
+# Library names
+NAME := libmlx.a
+NAME_UNAME := libmlx_$(UNAME).a
+
+# Source files
+SRC := mlx_init.c mlx_new_window.c mlx_pixel_put.c mlx_loop.c \
+	mlx_mouse_hook.c mlx_key_hook.c mlx_expose_hook.c mlx_loop_hook.c \
+	mlx_int_anti_resize_win.c mlx_int_do_nothing.c \
+	mlx_int_wait_first_expose.c mlx_int_get_visual.c \
+	mlx_flush_event.c mlx_string_put.c mlx_set_font.c \
+	mlx_new_image.c mlx_get_data_addr.c \
+	mlx_put_image_to_window.c mlx_get_color_value.c mlx_clear_window.c \
+	mlx_xpm.c mlx_int_str_to_wordtab.c mlx_destroy_window.c \
+	mlx_int_param_event.c mlx_int_set_win_event_mask.c mlx_hook.c \
+	mlx_rgb.c mlx_destroy_image.c mlx_mouse.c mlx_screen_size.c \
+	mlx_destroy_display.c
+
+# Object directory and files
+OBJ_DIR := obj
+OBJ := $(addprefix $(OBJ_DIR)/,$(SRC:%.c=%.o))
+
+# Compilation flags
+CFLAGS := -O3 -I$(INC)
+
+# Default target
+all: $(NAME)
+
+# Rule to compile object files
+$(OBJ_DIR)/%.o: %.c
+	@mkdir -p $(OBJ_DIR)
+	@$(CC) $(CFLAGS) -c $< -o $@
+	@echo "$(PURPLE)✅ $@ built!$(NC)"
+
+# Target to create the library
+$(NAME): $(OBJ)
+	@echo "$(BLUE)🔨 Creating library...$(NC)"
+	@ar rcs $(NAME) $(OBJ)
+	@ranlib $(NAME)
+	@cp $(NAME) $(NAME_UNAME)
+	@echo "$(GREEN)📚 $(NAME) and $(NAME_UNAME) created successfully!$(NC)"
+
+# Rule to run tests
+check: all
+	@test/run_tests.sh
+
+# Rule to show variables
+show:
+	@printf "$(YELLOW)NAME        : $(NAME)$(NC)\n"
+	@printf "$(YELLOW)NAME_UNAME  : $(NAME_UNAME)$(NC)\n"
+	@printf "$(YELLOW)CC          : $(CC)$(NC)\n"
+	@printf "$(YELLOW)CFLAGS      : $(CFLAGS)$(NC)\n"
+	@printf "$(YELLOW)SRC         :$(NC)\n$(SRC)\n"
+	@printf "$(YELLOW)OBJ         :$(NC)\n$(OBJ)\n"
+
+# Rule to clean up generated files
+clean:
+	@echo "$(RED)🧹 Cleaning up...$(NC)"
+	@rm -rf $(OBJ_DIR)/ $(NAME) $(NAME_UNAME) *~ core *.core
+	@echo "$(GREEN)Clean complete!$(NC)"
+
+# Rule to compile and link a test program
+test: all
+	@echo "$(BLUE)🔨 Compiling test program...$(NC)"
+	@gcc -I/usr/include -O3 -I.. -g -c -o main.o main.c
+	@gcc -o mlx-test main.o -L.. -lmlx -L/usr/include/../lib -lXext -lX11 -lm -lbsd
+	@echo "$(GREEN)🚀 $< Test program 'mlx-test' created successfully!$(NC)"
+
+# Phony targets
+.PHONY: all check show clean test
